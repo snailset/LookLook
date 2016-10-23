@@ -60,7 +60,7 @@ public class GridItemDividerDecoration extends RecyclerView.ItemDecoration {
 
         final int childCount = parent.getChildCount();
         final RecyclerView.LayoutManager lm = parent.getLayoutManager();
-        for (int i = 0; i < childCount; i++) {
+        for (int i = 0; i < childCount; i++) {  // 给每一个item 画 下面分割线 和 右边线
             final View child = parent.getChildAt(i);
             RecyclerView.ViewHolder viewHolder = parent.getChildViewHolder(child);
 

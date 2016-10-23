@@ -73,18 +73,22 @@ public class MainActivity extends BaseActivity {
 
 //        setStatusColor();
 
+        // 隐藏状态栏，全屏模式
         drawer.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 
         if (savedInstanceState == null) {
+            System.out.println("======== savedInstanceState is empty");
             nevigationId = SharePreferenceUtil.getNevigationItem(this);
+            // 从上次浏览的Fragment位置继续， 默认是知乎Fragment
             if (nevigationId != -1) {
                 currentMenuItem = navView.getMenu().findItem(nevigationId);
             }
             if (currentMenuItem==null){
                 currentMenuItem = navView.getMenu().findItem(R.id.zhihuitem);
             }
+            // 切换Fragment
             if (currentMenuItem != null) {
                 currentMenuItem.setChecked(true);
                 // TODO: 16/8/17 add a fragment and set toolbar title
@@ -95,6 +99,7 @@ public class MainActivity extends BaseActivity {
                 }
             }
         } else {
+            System.out.println("======== savedInstanceState is not empty");
             if (currentMenuItem!=null){
                 Fragment fragment = getFragmentById(currentMenuItem.getItemId());
                 String title = mTitleArryMap.get((Integer) currentMenuItem.getItemId());
@@ -110,7 +115,7 @@ public class MainActivity extends BaseActivity {
 
         }
 
-
+        // 监听菜单选中
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -123,54 +128,58 @@ public class MainActivity extends BaseActivity {
                     currentMenuItem.setChecked(true);
                     switchFragment(getFragmentById(currentMenuItem.getItemId()),mTitleArryMap.get(currentMenuItem.getItemId()));
                 }
+                //关闭抽屉菜单,GravityCompat.END向右，START想左， true表示有动画效果
                 drawer.closeDrawer(GravityCompat.END, true);
                 return true;
             }
         });
+        //  Api 21的设置
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            System.out.println("dfdf");
+            drawer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+                @Override
+                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) { // WindowInsets可以表示系统窗口的大小
+                    // inset the toolbar down by the status bar height
+                    // 将toolbar放在状态栏的下面
+                    ViewGroup.MarginLayoutParams lpToolbar = (ViewGroup.MarginLayoutParams) toolbar
+                            .getLayoutParams();
+                    lpToolbar.topMargin += insets.getSystemWindowInsetTop();
+                    lpToolbar.rightMargin += insets.getSystemWindowInsetRight(); // 横屏的时候需要
+                    toolbar.setLayoutParams(lpToolbar);
 
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+                    // inset the grid top by statusbar+toolbar & the bottom by the navbar (don't clip)
+                    // 将Fragment放在 状态栏和toolbar下面， navigation bar上面。 要考虑的横屏时 status bar是在右侧
+                    mFragmentContainer.setPadding(mFragmentContainer.getPaddingLeft(),
+                            insets.getSystemWindowInsetTop() + ViewUtils.getActionBarSize
+                                    (MainActivity.this),
+                            mFragmentContainer.getPaddingRight() + insets.getSystemWindowInsetRight(), // landscape 横屏的时候
+                            mFragmentContainer.getPaddingBottom() + insets.getSystemWindowInsetBottom());
 
-        drawer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                // inset the toolbar down by the status bar height
-                ViewGroup.MarginLayoutParams lpToolbar = (ViewGroup.MarginLayoutParams) toolbar
-                        .getLayoutParams();
-                lpToolbar.topMargin += insets.getSystemWindowInsetTop();
-                lpToolbar.rightMargin += insets.getSystemWindowInsetRight();
-                toolbar.setLayoutParams(lpToolbar);
+                    // we place a background behind the status bar to combine with it's semi-transparent
+                    // color to get the desired appearance.  Set it's height to the status bar height
+                    // 放一个与status bar一样大小的view，充当status bar
+                    View statusBarBackground = findViewById(R.id.status_bar_background);
+                    FrameLayout.LayoutParams lpStatus = (FrameLayout.LayoutParams)
+                            statusBarBackground.getLayoutParams();
+                    lpStatus.height = insets.getSystemWindowInsetTop();
+                    statusBarBackground.setLayoutParams(lpStatus);
 
-                // inset the grid top by statusbar+toolbar & the bottom by the navbar (don't clip)
-                mFragmentContainer.setPadding(mFragmentContainer.getPaddingLeft(),
-                        insets.getSystemWindowInsetTop() + ViewUtils.getActionBarSize
-                                (MainActivity.this),
-                        mFragmentContainer.getPaddingRight() + insets.getSystemWindowInsetRight(), // landscape
-                        mFragmentContainer.getPaddingBottom() + insets.getSystemWindowInsetBottom());
+                    // inset the filters list for the status bar / navbar
+                    // need to set the padding end for landscape case
 
-                // we place a background behind the status bar to combine with it's semi-transparent
-                // color to get the desired appearance.  Set it's height to the status bar height
-                View statusBarBackground = findViewById(R.id.status_bar_background);
-                FrameLayout.LayoutParams lpStatus = (FrameLayout.LayoutParams)
-                        statusBarBackground.getLayoutParams();
-                lpStatus.height = insets.getSystemWindowInsetTop();
-                statusBarBackground.setLayoutParams(lpStatus);
+                    // clear this listener so insets aren't re-applied
+                    drawer.setOnApplyWindowInsetsListener(null);
 
-                // inset the filters list for the status bar / navbar
-                // need to set the padding end for landscape case
-
-                // clear this listener so insets aren't re-applied
-                drawer.setOnApplyWindowInsetsListener(null);
-
-                return insets.consumeSystemWindowInsets();
-            }
-        });
+                    return insets.consumeSystemWindowInsets();
+                }
+            });
         }
 
 
-
+        // 设置侧滑菜单text 和 icon 非选中和按下的
         int[][] state = new int[][]{
                 new int[]{-android.R.attr.state_checked}, // unchecked
-                new int[]{android.R.attr.state_checked}  // pressed
+                new int[]{android.R.attr.state_checked}  // checked
         };
 
         int[] color = new int[]{
@@ -228,6 +237,7 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
     }
 
+    // 系统返回键 按下
     @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.END)) {
@@ -244,13 +254,16 @@ public class MainActivity extends BaseActivity {
 
     private void switchFragment(Fragment fragment, String title) {
 
+        // 如果是不同的Fragment,将会把原来的替换掉
         if (currentFragment == null || !currentFragment.getClass().getName().equals(fragment.getClass().getName()))
+            // FragmentTransaction 对象可以对一个容器里的Fragment进行add, remove replace addToBackStack操作，最后要调用commit
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                     .commit();
         currentFragment = fragment;
 
     }
 
+    // toolBar动画效果
     private void animateToolbar() {
         // this is gross but toolbar doesn't expose it's children to animate them :(
         View t = toolbar.getChildAt(0);
@@ -308,16 +321,16 @@ public class MainActivity extends BaseActivity {
                 case R.id.menu_open:
                     drawer.openDrawer(GravityCompat.END);
                     break;
-                case R.id.menu_about:
+                case R.id.menu_about:  // 关于
                     goAboutActivity();
                     break;
             }
             return true;
         }};
 
-    private  void goAboutActivity(){
-        Intent intent=new Intent(this, AboutActivity.class);
-                this.startActivity(intent);
+    private void goAboutActivity() {
+        Intent intent = new Intent(this, AboutActivity.class);
+        this.startActivity(intent);
     }
 
 

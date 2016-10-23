@@ -34,6 +34,7 @@ public class ZhihuPresenterImpl extends BasePresenterImpl implements IZhihuPrese
 
     @Override
     public void getLastZhihuNews() {
+        // 是不是应该在这里显示进度条更好
         mZhihuFragment.showProgressDialog();
         Subscription subscription = ApiManage.getInstence().getZhihuApiService().getLastDaily()
                 .map(new Func1<ZhihuDaily, ZhihuDaily>() {
@@ -63,8 +64,8 @@ public class ZhihuPresenterImpl extends BasePresenterImpl implements IZhihuPrese
                     @Override
                     public void onNext(ZhihuDaily zhihuDaily) {
                         mZhihuFragment.hidProgressDialog();
-                        mCacheUtil.put(Config.ZHIHU, gson.toJson(zhihuDaily));
-                        mZhihuFragment.updateList(zhihuDaily);
+                        mCacheUtil.put(Config.ZHIHU, gson.toJson(zhihuDaily)); // 存起来， 他为什么要自己实现个类
+                        mZhihuFragment.updateList(zhihuDaily);   //在这里更新 RecyclerView 为什么？
                     }
                 });
         addSubscription(subscription);

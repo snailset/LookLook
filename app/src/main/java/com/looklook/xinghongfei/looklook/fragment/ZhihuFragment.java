@@ -67,7 +67,7 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
     }
 
 
-
+    // 在 onCreateView后调用
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -108,21 +108,22 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
         initialListener();
 
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+            // 有什么用 ？
             mLinearLayoutManager = new WrapContentLinearLayoutManager(getContext());
 
         }else {
             mLinearLayoutManager=new LinearLayoutManager(getContext());
         }
         recycle.setLayoutManager(mLinearLayoutManager);
-        recycle.setHasFixedSize(true);
-        recycle.addItemDecoration(new GridItemDividerDecoration(getContext(), R.dimen.divider_height, R.color.divider));
+        recycle.setHasFixedSize(true);  // 固定大小
+        recycle.addItemDecoration(new GridItemDividerDecoration(getContext(), R.dimen.divider_height, R.color.divider)); // 下面和右边分割线
         // TODO: 16/8/13 add  animation
-        recycle.setItemAnimator(new DefaultItemAnimator());
+        recycle.setItemAnimator(new DefaultItemAnimator()); //默认动画
         recycle.setAdapter(zhihuAdapter);
-        recycle.addOnScrollListener(loadingMoreListener);
+        recycle.addOnScrollListener(loadingMoreListener);   //todo 滑动监听
 //      recycle.addOnScrollListener(tooldimissListener);
         if (connected) {
-            loadDate();
+            loadDate();  // 加载数据
         }
 
 
@@ -195,17 +196,17 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
 
     }
 
-
+    // 更新 RecyclerView
     @Override
     public void updateList(ZhihuDaily zhihuDaily) {
-        if (loading) {
+        if (loading) {          // TODO: 2016/10/19 这里不是很懂
             loading = false;
             zhihuAdapter.loadingfinish();
         }
         currentLoadDate = zhihuDaily.getDate();
         zhihuAdapter.addItems(zhihuDaily.getStories());
 //        if the new data is not full of the screen, need load more data
-        if (!recycle.canScrollVertically(View.SCROLL_INDICATOR_BOTTOM)) {
+        if (!recycle.canScrollVertically(View.SCROLL_INDICATOR_BOTTOM)) { // 不能往下滑就是数据不够
             loadMoreDate();
         }
     }
@@ -231,6 +232,7 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
             Snackbar.make(recycle, getString(R.string.snack_infor), Snackbar.LENGTH_SHORT).setAction("重试", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // todo 重试 怎么？
                     if (currentLoadDate.equals("0")) {
                         zhihuPresenter.getLastZhihuNews();
                     } else {
@@ -248,7 +250,7 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
         ButterKnife.reset(this);
     }
 
-
+    // 检查
     private void checkConnectivity(View view) {
         final ConnectivityManager connectivityManager
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -267,6 +269,7 @@ public class ZhihuFragment extends BaseFragment implements IZhihuFragment {
 //            noConnection.setImageDrawable(avd);
 //            avd.start();
             if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+                // 收到网络后回调，好像并没有什么用- -
                 connectivityManager.registerNetworkCallback(
                         new NetworkRequest.Builder()
                                 .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build(),

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 我的理解是这样的- - ：
+android:fitsSystemWindows="true" 表示布局的时候算上系统窗口了，比如状态栏
+ -->
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,6 +11,8 @@
     android:clipToPadding="false"
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
+
+    <!-- 主要内容 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -35,6 +40,9 @@
             app:title="@string/app_name"/>
     </FrameLayout>
 
+    <!-- 侧滑菜单 -->
+    <!-- app:headerLayout表示菜单上面的 -->
+    <!-- app:menu表示菜单 -->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

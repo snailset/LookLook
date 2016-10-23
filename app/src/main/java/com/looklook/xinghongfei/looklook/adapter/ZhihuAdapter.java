@@ -59,12 +59,11 @@ public class ZhihuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         switch (viewType) {
-            case NOMAL_ITEM:
+            case NOMAL_ITEM:        // 正常情况下
                 return new ZhihuViewHolder(LayoutInflater.from(mContext).inflate(R.layout.zhihu_layout_item, parent, false));
 
-            case TYPE_LOADING_MORE:
+            case TYPE_LOADING_MORE: // 非正常情况下
                 return new LoadingMoreHolder(LayoutInflater.from(mContext).inflate(R.layout.infinite_loading, parent, false));
 
         }
@@ -129,7 +128,7 @@ public class ZhihuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        if (!zhihuDailyItem.hasFadedIn) {
+                        if (!zhihuDailyItem.hasFadedIn) {  // 这里TM有什么用, 去掉好像并没有区别啊
                             holder.imageView.setHasTransientState(true);
                             final ObservableColorMatrix cm = new ObservableColorMatrix();
                             final ObjectAnimator animator = ObjectAnimator.ofFloat(cm, ObservableColorMatrix.SATURATION, 0f, 1f);
@@ -163,14 +162,16 @@ public class ZhihuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
+    //todo 下次看 点击以后去 详情页
     private void goDescribeActivity(ZhihuViewHolder holder,ZhihuDailyItem zhihuDailyItem){
 
+        // 点下去以后保存浏览记录， 显示灰色的字体
         DBUtils.getDB(mContext).insertHasRead(Config.ZHIHU, zhihuDailyItem.getId(), 1);
         holder.textView.setTextColor(Color.GRAY);
         Intent intent = new Intent(mContext, ZhihuDescribeActivity.class);
         intent.putExtra("id", zhihuDailyItem.getId());
         intent.putExtra("title", zhihuDailyItem.getTitle());
-        intent.putExtra("image",mImageUrl);
+        intent.putExtra("image",mImageUrl);  // 这里的mImageUrl是来搞笑的吗
 //                final android.support.v4.util.Pair<View, String>[] pairs = Help.createSafeTransitionParticipants
 //                        ((Activity) mContext, false,new android.support.v4.util.Pair<>(holder.imageView, mContext.getString(R.string.transition_shot)),
 //                                new android.support.v4.util.Pair<>(holder.linearLayout, mContext.getString(R.string.transition_shot_background)));
@@ -215,6 +216,7 @@ public class ZhihuAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     // TODO: 16/8/13  don't forget call fellow method
+    // TODO: 2016/10/19 这是什么意思啊
     @Override
     public void loadingStart() {
         if (showLoadingMore) return;

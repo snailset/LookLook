@@ -4,9 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -72,7 +69,7 @@ public class MeiziPhotoDescribeActivity extends BaseActivity {
         parseIntent();
         getData();
         setupPhotoAttacher();
-        mToolbar.setAlpha(0.7f);
+        mToolbar.setAlpha(0.7f);  // 这个透明度是基于之前设置好的背景
         mRelativeLayout.setAlpha(0.3f);
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
             getWindow().getSharedElementEnterTransition().addListener(mListener);
@@ -83,13 +80,13 @@ public class MeiziPhotoDescribeActivity extends BaseActivity {
     }
 
     void setupPhotoAttacher() {
+        //单击图片
         mPhotoViewAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
             @Override
             public void onViewTap(View view, float x, float y) {
                 hideOrShowToolbar();
             }
         });
-
         mPhotoViewAttacher.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -278,8 +275,9 @@ public class MeiziPhotoDescribeActivity extends BaseActivity {
 
                             // color the status bar. Set a complementary dark color on L,
                             // light or dark color on M (with matching status bar icons)
-                            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
+                                // 逐渐改变状态栏的颜色
                                 int statusBarColor = getWindow().getStatusBarColor();
                                 final Palette.Swatch topColor =
                                         ColorUtils.getMostPopulousSwatch(palette);

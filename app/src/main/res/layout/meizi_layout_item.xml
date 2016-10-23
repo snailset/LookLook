@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 这样很简单的就把间隔搞定了 padding -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/zhihu_item_layout"
@@ -10,6 +11,7 @@
               android:padding="10dp"
               android:stateListAnimator="@animator/raise">
 
+    <!-- 可以当RecyclerView的Item, 设置每一项的圆角之类的啊 -->
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"

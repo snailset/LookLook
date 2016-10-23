@@ -63,7 +63,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/Look.Home"/>
 
-
+        <!--android:theme="@style/Look.Translucent" 背景透明，activity悬浮效果-->
+        <!-- 简单的理解为给这个activity加上一个返回键，返回到父Activity -->
         <activity
             android:name=".Activity.AboutActivity"
             android:parentActivityName=".MainActivity"

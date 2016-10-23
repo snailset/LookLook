@@ -33,7 +33,11 @@ import com.looklook.xinghongfei.looklook.util.ViewUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * A {@link FrameLayout} which responds to nested scrolls to create drag-dismissable layouts.
+ * Applies an elasticity factor to reduce movement as you approach the given dismiss distance.
+ * Optionally also scales down content during drag.
+ */
 public class ElasticDragDismissFrameLayout extends FrameLayout {
 
     // configurable attribs

@@ -107,7 +107,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
         initView();
         getData();
 
-        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);
+        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);  // 这个东西 就是 下拉scroll activity消失 这个东西还是去plaid项目里面去看吧
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
 
             getWindow().getSharedElementReturnTransition().addListener(zhihuReturnHomeListener);
@@ -118,6 +118,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
 
     }
 
+    // TODO: 2016/10/20 一会再看
     private void initlistenr() {
         zhihuReturnHomeListener =
                 new AnimUtils.TransitionListenerAdapter() {
@@ -142,7 +143,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
         scrollListener = new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (oldScrollY<168){
+                if (oldScrollY<168){  // 小于168, 图片和文字 与 NestedScrollView一起滑动
                     mShot.setOffset(-oldScrollY);
                     mTranslateYTextView.setOffset(-oldScrollY);
                 }
@@ -157,7 +158,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
         mImageUrl = getIntent().getStringExtra("image");
         mIZhihuStoryPresenter = new ZhihuStoryPresenterImpl(this);
         mNest.setOnScrollChangeListener(scrollListener);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){  // 这是在干嘛 ？
             postponeEnterTransition();
             mShot.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
@@ -183,14 +184,15 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
                 mNest.smoothScrollTo(0,0);
             }
         });
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {  // 返回键
             @Override
             public void onClick(View v) {
                 expandImageAndFinish();
             }
         });
-        mTranslateYTextView.setText(title);
+        mTranslateYTextView.setText(title);  // 标题
 
+        // web设置的属性，没有细看，以后再看
         WebSettings settings = wvZhihu.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
@@ -286,15 +288,15 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
     @Override
     public void showZhihuStory(ZhihuStory zhihuStory) {
 
-            Glide.with(this)
-                    .load(zhihuStory.getImage()).centerCrop()
-                    .listener(loadListener).override(width,heigh)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .into(mShot);
+        Glide.with(this)
+                .load(zhihuStory.getImage()).centerCrop()
+                .listener(loadListener).override(width, heigh)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(mShot);
         url = zhihuStory.getShareUrl();
-        isEmpty=TextUtils.isEmpty(zhihuStory.getBody());
-        mBody=zhihuStory.getBody();
-        scc=zhihuStory.getCss();
+        isEmpty = TextUtils.isEmpty(zhihuStory.getBody());
+        mBody = zhihuStory.getBody();
+        scc = zhihuStory.getCss();
         if (isEmpty) {
             wvZhihu.loadUrl(url);
         } else {
@@ -306,8 +308,9 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
     }
 
 
-
+    // 当图片是收缩状态，会先张开图片，然后退出
     private void expandImageAndFinish() {
+        System.out.println("============= mShot = " + mShot.getOffset());
         if (mShot.getOffset() != 0f) {
             Animator expandImage = ObjectAnimator.ofFloat(mShot, ParallaxScrimageView.OFFSET,
                     0f);
@@ -334,6 +337,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
         }
     }
 
+    // 监听图片加载之后会怎么样，将获取到的图片作为调色板设置 status bar的颜色，很强大，但是其他的我就不知道他干了什么
     private RequestListener loadListener = new RequestListener<String, GlideDrawable>() {
         @Override
         public boolean onResourceReady(GlideDrawable resource, String model,
@@ -342,6 +346,7 @@ public class ZhihuDescribeActivity extends BaseActivity implements IZhihuStory {
             final Bitmap bitmap = GlideUtils.getBitmap(resource);
             final int twentyFourDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     24, ZhihuDescribeActivity.this.getResources().getDisplayMetrics());
+            // 这个东西，根据图片 获取颜色
             Palette.from(bitmap)
                     .maximumColorCount(3)
                     .clearFilters() /* by default palette ignore certain hues

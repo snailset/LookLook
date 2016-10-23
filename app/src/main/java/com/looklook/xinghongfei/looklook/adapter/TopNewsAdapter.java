@@ -183,6 +183,7 @@ public class TopNewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             intent.putExtra("title", newsBeanItem.getTitle());
             intent.putExtra("image", newsBeanItem.getImgsrc());
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+            // 两个元素共享动画
             final android.support.v4.util.Pair<View, String>[] pairs = Help.createSafeTransitionParticipants
                     ((Activity) mContext, false,new android.support.v4.util.Pair<>(((TopNewsViewHolder)holder).imageView, mContext.getString(R.string.transition_topnew)),
                             new android.support.v4.util.Pair<>(((TopNewsViewHolder)holder).linearLayout, mContext.getString(R.string.transition_topnew_linear)));
